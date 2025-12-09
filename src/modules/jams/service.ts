@@ -159,6 +159,11 @@ export abstract class JamService {
 
     const submissions = await JamSubmissionModel.getAllSubmissionsForJam({ jamId: jam.id })
 
+    if (submissions.length === 0) {
+      // if no one submitted, don't send a recap message
+      return
+    }
+
     await this.sendThemeChannelMessage(
       guildSettings.guildId,
       guildSettings.themeAnnouncementChannelId!,
