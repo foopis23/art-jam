@@ -154,9 +154,9 @@ export const jamAnnouncementTemplate: MessageTemplate<{
       new TextDisplayBuilder()
         .setContent(
           stripIndents`
-          # Theme of the Week (${dateString})
+          # Theme of the Month (${dateString})
           ~~                                                                                                                ~~
-          -# The dawn of the new week has begun.
+          -# The dawn of the new month has begun.
           ## New Theme: [${theme}]
           Deadline: ${deadlineString}, 11:59pm
           All art is accepted. Submission Link:
@@ -217,7 +217,7 @@ export const jamMidweekReminderTemplate: MessageTemplate<{
     flags: MessageFlags.IsComponentsV2,
     components: [
       new TextDisplayBuilder().setContent(stripIndents`
-        # —Reminder—
+        # —Monthly Reminder—
         For Art Jam [[${guildJam.jam.theme}](${guildJam.messageLink})]
 
         Submission deadline is ${deadlineString}, 11:59pm.
@@ -278,7 +278,7 @@ export const jamRecapMessageTemplate: MessageTemplate<{
     flags: MessageFlags.IsComponentsV2,
     components: [
       new TextDisplayBuilder().setContent(stripIndents`
-        # —End of the Week—
+        # —End of the Month—
         -# Submission for Art Jam [[${jamDateString} - ${guildJam.jam.theme}](${guildJam.messageLink})] is over
 
         Contributions: [${totalSubmissions}]

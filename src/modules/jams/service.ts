@@ -1,7 +1,7 @@
 import { findAllGuildsInCommonWithUser } from '@/lib/discord/util'
 import { log } from '@/log'
 import { client } from '@/modules/bot/client'
-import { DEFAULT_THEME_POOL, JAM_SUBMISSION_SCORE } from '@/modules/jams/const'
+import { DEFAULT_THEME_POOL, JAM_SCHEDULE, JAM_SUBMISSION_SCORE } from '@/modules/jams/const'
 import { SettingsService } from '@/modules/settings/service'
 import { Cron } from 'croner'
 import {
@@ -29,9 +29,13 @@ export abstract class JamService {
   static async generateJam() {
     const theme = await this.generateRandomTheme()
 
-    const nextDeadline = new Cron(`59 11 * * SUN`).nextRun()
+    // Deadline is the last minute of the current month in the configured timezone.
+    const nextMonthStart = new Cron(JAM_SCHEDULE.monthStartCron).nextRun()
+    const nextDeadline = nextMonthStart
+      ? new Date(nextMonthStart.getTime() - JAM_SCHEDULE.deadlineOffsetMs)
+      : null
     if (!nextDeadline) {
-      throw new Error('Failed to calculate next announcement date')
+      throw new Error('Failed to calculate monthly jam deadline')
     }
     const deadlineDate = new Date(nextDeadline)
 
