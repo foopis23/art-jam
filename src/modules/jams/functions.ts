@@ -1,3 +1,5 @@
+import { log } from '@/log'
+import { JAM_SCHEDULE } from '@/modules/jams/const'
 import { JamService } from '@/modules/jams/service'
 import type { TimeStr } from 'inngest'
 import { inngest } from '../inngest/inngest'
@@ -19,7 +21,7 @@ export const generateJamFunction = inngest.createFunction(
     id: 'generate-jam',
   },
   {
-    cron: 'TZ=America/New_York 0 12 * * MON',
+    cron: JAM_SCHEDULE.generateCron,
   },
   async ({ step }) => {
     const jam = await step.run('generate-jam', async () => {
@@ -89,13 +91,14 @@ export const fanOutJamReminderNotificationsFunction = inngest.createFunction(
     id: 'fan-out-jam-reminder-notifications',
   },
   {
-    cron: 'TZ=America/New_York 0 12 * * THU',
+    cron: JAM_SCHEDULE.reminderCron,
   },
   async ({ step }) => {
     const jam = await JamService.getCurrentJam()
 
     if (!jam) {
-      throw new Error('No current jam found')
+      log.warn('No current jam found for reminder notifications')
+      return
     }
 
     const guildsToNotify = await step.run('get-guilds-to-notify', async () => {
@@ -142,12 +145,13 @@ export const fanOutJamRecapNotificationsFunction = inngest.createFunction(
     id: 'fan-out-jam-recap-notifications',
   },
   {
-    cron: 'TZ=America/New_York 0 9 * * MON',
+    cron: JAM_SCHEDULE.recapCron,
   },
   async ({ step }) => {
     const jam = await JamService.getLatestJam()
     if (!jam) {
-      throw new Error('No latest jam found')
+      log.error('No latest jam found for recap notifications')
+      return
     }
 
     const guildsToNotify = await step.run('get-guilds-to-notify', async () => {
