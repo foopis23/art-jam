@@ -95,9 +95,13 @@ export abstract class JamService {
       throw new Error('Theme announcement channel not found')
     }
 
-    const jam = await JamModel.getCurrentJam()
+    let jam = await JamModel.getCurrentJam()
     if (!jam) {
-      throw new Error('No current jam found')
+      // this should only happen if there jam generation somehow failed.. so try regenerating
+      jam = await JamService.generateJam()
+      if (!jam) {
+        throw new Error('No current jam found')
+      }
     }
 
     const guildJam = await GuildJamModel.getByJamIdAndGuildId({
