@@ -45,9 +45,9 @@ export const JAM_SUBMISSION_SCORE = 15
 
 export const JAM_SCHEDULE = {
   timezone: 'America/New_York',
-  generateCron: 'TZ=America/New_York 0 12 1 * *',
-  reminderCron: 'TZ=America/New_York 0 12 15 * *',
-  recapCron: 'TZ=America/New_York 0 9 1 * *',
-  monthStartCron: 'TZ=America/New_York 0 0 1 * *',
+  generateCron: '0 12 1 * *',
+  reminderCron: '0 12 15 * *',
+  recapCron: '0 9 1 * *',
+  monthStartCron: '0 0 1 * *',
   deadlineOffsetMs: 60_000,
 } as const

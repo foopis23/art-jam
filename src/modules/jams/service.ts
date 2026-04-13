@@ -30,7 +30,10 @@ export abstract class JamService {
     const theme = await this.generateRandomTheme()
 
     // Deadline is the last minute of the current month in the configured timezone.
-    const nextMonthStart = new Cron(JAM_SCHEDULE.monthStartCron).nextRun()
+    const nextMonthStart = new Cron(JAM_SCHEDULE.monthStartCron, {
+      timezone: JAM_SCHEDULE.timezone,
+    }).nextRun()
+
     const nextDeadline = nextMonthStart
       ? new Date(nextMonthStart.getTime() - JAM_SCHEDULE.deadlineOffsetMs)
       : null
