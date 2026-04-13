@@ -2,7 +2,12 @@ import { log } from '@/log'
 import { JAM_SCHEDULE } from '@/modules/jams/const'
 import { JamService } from '@/modules/jams/service'
 import type { TimeStr } from 'inngest'
-import { inngest } from '../inngest/inngest'
+import {
+  inngest,
+  jamAnnouncementNotification,
+  jamRecapNotification,
+  jamReminderNotification,
+} from '../inngest/inngest'
 import { SettingsService } from '../settings/service'
 
 const THROTTLE_SETTINGS = {
@@ -19,9 +24,11 @@ const THROTTLE_SETTINGS = {
 export const generateJamFunction = inngest.createFunction(
   {
     id: 'generate-jam',
-  },
-  {
-    cron: `TZ=${JAM_SCHEDULE.timezone} ${JAM_SCHEDULE.generateCron}`,
+    triggers: [
+      {
+        cron: `TZ=${JAM_SCHEDULE.timezone} ${JAM_SCHEDULE.generateCron}`,
+      },
+    ],
   },
   async ({ step }) => {
     const jam = await step.run('generate-jam', async () => {
@@ -55,9 +62,7 @@ export const jamAnnouncementNotificationFunction = inngest.createFunction(
       period: '5s',
       burst: 5,
     },
-  },
-  {
-    event: 'jam.notification.announcement',
+    triggers: [jamAnnouncementNotification],
   },
   async ({ step, event }) => {
     const guildSettings = event.data.guild
@@ -89,9 +94,11 @@ export const jamAnnouncementNotificationFunction = inngest.createFunction(
 export const fanOutJamReminderNotificationsFunction = inngest.createFunction(
   {
     id: 'fan-out-jam-reminder-notifications',
-  },
-  {
-    cron: `TZ=${JAM_SCHEDULE.timezone} ${JAM_SCHEDULE.reminderCron}`,
+    triggers: [
+      {
+        cron: `TZ=${JAM_SCHEDULE.timezone} ${JAM_SCHEDULE.reminderCron}`,
+      },
+    ],
   },
   async ({ step }) => {
     const jam = await JamService.getCurrentJam()
@@ -126,9 +133,7 @@ export const jamMidweekReminderNotificationFunction = inngest.createFunction(
       period: '5s',
       burst: 5,
     },
-  },
-  {
-    event: 'jam.notification.reminder',
+    triggers: [jamReminderNotification],
   },
   async ({ step, event }) => {
     const guildSettings = event.data.guild
@@ -143,9 +148,11 @@ export const jamMidweekReminderNotificationFunction = inngest.createFunction(
 export const fanOutJamRecapNotificationsFunction = inngest.createFunction(
   {
     id: 'fan-out-jam-recap-notifications',
-  },
-  {
-    cron: `TZ=${JAM_SCHEDULE.timezone} ${JAM_SCHEDULE.recapCron}`,
+    triggers: [
+      {
+        cron: `TZ=${JAM_SCHEDULE.timezone} ${JAM_SCHEDULE.recapCron}`,
+      },
+    ],
   },
   async ({ step }) => {
     const jam = await JamService.getLatestJam()
@@ -172,9 +179,7 @@ export const jamRecapNotificationFunction = inngest.createFunction(
   {
     id: 'handle-jam-recap',
     throttle: THROTTLE_SETTINGS,
-  },
-  {
-    event: 'jam.notification.recap',
+    triggers: [jamRecapNotification],
   },
   async ({ step, event }) => {
     const guildSettings = event.data.guild

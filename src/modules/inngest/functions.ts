@@ -8,9 +8,11 @@ export const functions = [
   inngest.createFunction(
     {
       id: 'global-failure-handler',
-    },
-    {
-      event: 'inngest/function.failed',
+      triggers: [
+        {
+          event: 'inngest/function.failed',
+        },
+      ],
     },
     async ({ event }) => {
       log.error(event, 'Inngest Function failed!')
